@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="./utils.js"></script>
+	<link rel="stylesheet" href="./index.css" />
+</head>
+<body>
+	<h1>success load page</h1>
+	<input type="hidden" id="room_id" />
+	<script>
+		document.getElementById('room_id').value = Math.random();
+	</script>
+	<script src="./index.js"></script>
+</body>
+</html>
