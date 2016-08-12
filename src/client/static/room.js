@@ -1,8 +1,7 @@
 ; (function () {
-	var port = '8001';
-	var host = 'ws://' + '10.101.120.56';
-	var socket = io(host + ':' + port);
-	console.log(socket);
+	var server = $('server').value;
+	var socket = io('ws://' + server);
+
 	function init() {
 		var roomId = $('roomId').value;
 		socket.emit('register', { roomId: roomId });

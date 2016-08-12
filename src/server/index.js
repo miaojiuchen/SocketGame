@@ -11,21 +11,23 @@ var _ = objectAssign({}, require('./utils.js'), require('underscore'));
 
 var models = require('./models.js');
 var Room = models.Room;
-var User = models.User;
+var Player = models.Player;
 var initRoom = models.initRoom;
 
 // app settings
 require('./appsettings.js')(app);
 var _port = app.get('port');
+var _host = app.get('host');
+
 app.get('/', function (req, res) {
     var roomId = uuid.v4();
-    qrcode.toDataURL('http://10.101.120.56:' + _port + '/player?roomId=' + roomId, function (err, src) {
-        res.render('room', { title: 'Socket Game', roomId: roomId, imgSrc: src, message: 'index from server' });
+    qrcode.toDataURL('http://' + _host + ':' + _port + '/player?roomId=' + roomId, function (err, src) {
+        res.render('room', { title: 'Socket Game', roomId: roomId, imgSrc: src, message: 'index from server', host: _host, port: _port });
     });
 });
 
 app.get('/player', function (req, res) {
-    res.render('player', { title: 'Socket Game' });
+    res.render('player', { title: 'Socket Game', host: _host, port: _port });
 });
 
 app.use(express.static(path.resolve(__dirname, '..') + '/client/static'));
@@ -45,10 +47,14 @@ function getRoomBySocket(socketId) {
 io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         var socketId = this.id;
+        // 1、离开房间
         var roomId = getRoomBySocket(socketId);
         if (roomId) {
-            _.print('Room', roomId, 'Disconnected and unregistered');
-            delete rooms[roomId];
+            var pair = rooms[roomId];
+            if (pair.room.players.length === 0) {
+                delete pair;
+                _.print('Room', roomId, 'Disconnected and unregistered');
+            }
         }
     });
     socket.on('register', function (data) {
@@ -58,14 +64,18 @@ io.on('connection', function (socket) {
     });
     socket.on('playerEnter', function (data) {
         var playerName = data.playerName, roomId = data.roomId;
-        _.print('Player ', playerName, 'Enter room', roomId);
-        // rooms[this.id].acceptPlayer(new Player({ name: data.playName }));
-        var room = rooms[roomId];
-        sockets[room.socketId].emit('playerEnter', { playName: playerName });
+        var pair = rooms[roomId];
+
+        // 为当前房间增加玩家
+        if (pair.room.acceptPlayer(new Player({ name: playerName }))) {
+            // 通知当前房间渲染新玩家资料
+            sockets[pair.socketId].emit('playerEnter', { playName: playerName });
+            _.print('Player ', playerName, 'Enter room', roomId);
+        } else {
+            return;
+        }
     });
 });
 
 server.listen(_port);
 console.log('Server running at port', _port);
-
-

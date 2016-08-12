@@ -10,5 +10,6 @@ html
             span= roomId
         img(src= imgSrc widths= 400 height= 400)
         input(type="hidden" value= roomId id="roomId")
+        input(type="hidden" value= host + ':' + port id="server")
         script(src= './room.js')
         

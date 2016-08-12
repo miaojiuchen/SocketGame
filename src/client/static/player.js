@@ -10,9 +10,8 @@
         }));
     }
     function prepare() {
-        var host = 'ws://' + '10.101.120.56';
-        var port = '8001';
-        var socket = io(host + ':' + port);
+        var server = $('server').value;
+        var socket = io('ws://' + server);
 
         function extractRoomId(field) {
             var reg = field + '=([0-9\.]|[^&])*';
