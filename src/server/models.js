@@ -1,35 +1,34 @@
 var uuid = require('uuid');
 
-var User = function(params) {
+var Player = function (params) {
 	this.name = params.name || 'anony';
 	this.status = params.status || 0;
 }
 
-var Room = function(params) {
-	this.roomSize = params.size || 2;
-	this.id = params.id || uuid.v4();
-	this.users = [];
+var Room = function (params) {
 	this.capacity = params.capacity || 2;
+	this.roomId = params.roomId || uuid.v4();
+	this.players = [];
 }
 
 Room.prototype = {
-	acceptPlayer: function(user) {
-		if (this.users.length >= this.capacity) {
+	acceptPlayer: function (player) {
+		if (this.players.length >= this.capacity) {
 			return;
 		} else {
-			if (user instanceof User)
-				this.users.push(user);
+			if (player instanceof Player)
+				this.players.push(player);
 			else
-				throw new Error('Room.acceptPlayer: Param must be a valid User Object');
+				throw new Error('Room.acceptPlayer: Param must be a valid Player Object');
 		}
 	},
-	currentSize: function() {
-		return this.users.length;
+	currentSize: function () {
+		return this.players.length;
 	}
 }
 
-exports.initRoom = function(params) {
+exports.initRoom = function (params) {
 	return new Room(params);
 }
-exports.User = User;
+exports.Player = Player;
 exports.Room = Room;

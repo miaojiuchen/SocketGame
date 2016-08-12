@@ -1,0 +1,14 @@
+html
+    head
+        title= title
+        link(rel="stylesheet", href="./player.css")
+        script(src="./utils.js")
+        script(src="/socket.io/socket.io.js")
+    body
+        img(src="./player.gif" width=400 height=400 class="shake-img")
+        #mask
+            .center
+                input(type="text" id="playerName" class="input-name" placeholder="输入昵称")
+                input(type="button" id="enter" class="button blue" value="进入")
+        script(src= "./player.js")
+        

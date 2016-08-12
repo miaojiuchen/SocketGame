@@ -1,9 +1,13 @@
 html
     head
         title= title
+        link(rel="stylesheet", href="./room.css")
+        script(src='/socket.io/socket.io.js')
+        script(src="./utils.js")
     body
         h1= message
-        img(src= imgSrc, width=400, height=400)
-
-    script
+        h2= 'roomId: ' + roomId
+        img(src= imgSrc widths= 400 height= 400)
+        input(type="hidden" value= roomId id="roomId")
+        script(src= './room.js')
         
