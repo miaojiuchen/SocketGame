@@ -6,7 +6,8 @@ html
         script(src="./utils.js")
     body
         h1= message
-        h2= 'roomId: ' + roomId
+        a(href='http://localhost:8001/player?roomId=' + roomId target="__blank")
+            span= roomId
         img(src= imgSrc widths= 400 height= 400)
         input(type="hidden" value= roomId id="roomId")
         script(src= './room.js')

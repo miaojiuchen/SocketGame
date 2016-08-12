@@ -8,7 +8,9 @@
 		socket.emit('register', { roomId: roomId });
 
 		socket.on('playerEnter', function (data) {
-			alert(data);
+			document.body.appendChild(
+				document.createTextNode(JSON.stringify(data))
+			);
 		});
 		socket.on('playerShake', function (data) {
 			alert(data);
