@@ -1,6 +1,5 @@
 var qrcode = require('qrcode');
 var path = require('path');
-var fs = require('fs');
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
@@ -11,26 +10,17 @@ var Room = models.Room;
 var User = models.User;
 var initRoom = models.initRoom;
 
+// app settings
+require('./appsettings.js')(app);
+
 app.get('/', function (req, res) {
-    fs.readFile(path.resolve(__dirname, '..') + '/client/index.html', function (err, data) {
-        if (err) {
-            throw new Error(err);
-        }
-        else {
-            res.end(data);
-        }
+    qrcode.toDataURL('http://10.101.120.56:8001/room?rooId=2e56c', function (err, src) {
+        res.render('index', { title: 'Socket Game', roomId: '2e56c', imgSrc: src, message: 'index from server' });
     });
 });
 
-app.get('room', function (req, res) {
-    fs.readFile(path.resolve(___dirname, '..') + 'client/room.html', function (err, data) {
-        if (err) {
-            throw new Error(err);
-        }
-        else {
-            res.end(data);
-        }
-    });
+app.get('/room', function (req, res) {
+    res.render('room', { title: 'Socket Game', message: 'room from server' });
 });
 
 app.use(express.static(path.resolve(__dirname, '..') + '/client'));
@@ -48,10 +38,6 @@ io.on('connection', function (socket) {
             socket.emit('pingFromServer', { timestamp: new Date().getTime(), from: 'server' });
         }, 500);
     });
-});
-
-QRCode.toDataURL('i am a pony!',function(err,url){
-    console.log(url);
 });
 
 server.listen(8001);
