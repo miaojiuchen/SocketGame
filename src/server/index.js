@@ -33,6 +33,7 @@ app.get('/player', function (req, res) {
 app.use(express.static(path.resolve(__dirname, '..') + '/client/static'));
 
 var rooms = {};
+var players = {};
 var sockets = io.sockets.sockets;// 简单地使用 "/" namespace来管理sockets
 function getRoomBySocket(socketId) {
     var found = _.find(
@@ -51,15 +52,23 @@ io.on('connection', function (socket) {
         var roomId = getRoomBySocket(socketId);
         if (roomId) {
             var pair = rooms[roomId];
-            var players = pair.room.players;
             // 向房间中的玩家发送roomDisconnect事件
-            players.forEach(function (p, i) {
+            pair.room.players.forEach(function (p, i) {
                 sockets[p.socketId].emit('roomDisconnect', {});
             });
             delete pair;
             _.print('Room', roomId, 'Disconnected and unregistered');
         }
         //2、玩家离开房间
+        else {
+            // 根据socketId获取房间号和玩家名
+            var obj = players[socketId];
+            if (obj) {
+                var roomPlayers = rooms[obj.roomId].room.players;
+                roomPlayers.splice(_.findIndex(roomPlayers, function (p) { return p.playerName === obj.playerName }));
+                _.print('Player', obj.playerName, 'leave room', obj.roomId);
+            }
+        }
     });
     socket.on('register', function (data) {
         var roomId = data.roomId;
@@ -73,8 +82,9 @@ io.on('connection', function (socket) {
         // 为当前房间增加玩家
         if (pair.room.acceptPlayer(new Player({ name: playerName, socketId: this.id }))) {
             // 通知当前房间渲染新玩家资料
-            sockets[pair.socketId].emit('playerEnter', { playName: playerName });
-            _.print('Player ', playerName, 'Enter room', roomId);
+            sockets[pair.socketId].emit('playerEnter', { playerName: playerName });
+            players[this.id] = { roomId: pair.room.roomId, playerName: playerName };
+            _.print('Player', playerName, 'enter room', roomId);
         } else {
             return;
         }
