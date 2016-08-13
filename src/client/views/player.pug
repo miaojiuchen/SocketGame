@@ -10,6 +10,9 @@ html
             .center
                 input(type="text" id="playerName" class="input-name" placeholder="输入昵称")
                 input(type="button" id="enter" class="button blue" value="进入")
+        #mask2
+            .center
+                h2= '房间关闭 :('
         input(type="hidden" value= host + ':' + port id="server")
         script(src= "./player.js")
         

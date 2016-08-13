@@ -82,7 +82,7 @@ html,body{
 	margin-bottom: 40px;
 	padding: 5px;
 }
-#mask{
+#mask,#mask2{
 	display: block;
 	position: fixed;
 	left: 0;
@@ -92,9 +92,15 @@ html,body{
 	background: #fff;
 	z-index: 10;
 }
-#mask .center{
+.center{
 	position: absolute;
 	left: 50%;
 	top: 50%;
 	-webkit-transform : translate(-50%,-50%);
+}
+#mask2{
+	display: none;
+}
+#mask2 h2{
+	text-align: center;
 }

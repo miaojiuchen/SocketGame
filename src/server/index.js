@@ -47,15 +47,19 @@ function getRoomBySocket(socketId) {
 io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         var socketId = this.id;
-        // 1、离开房间
+        // 1、房间关闭
         var roomId = getRoomBySocket(socketId);
         if (roomId) {
             var pair = rooms[roomId];
-            if (pair.room.players.length === 0) {
-                delete pair;
-                _.print('Room', roomId, 'Disconnected and unregistered');
-            }
+            var players = pair.room.players;
+            // 向房间中的玩家发送roomDisconnect事件
+            players.forEach(function (p, i) {
+                sockets[p.socketId].emit('roomDisconnect', {});
+            });
+            delete pair;
+            _.print('Room', roomId, 'Disconnected and unregistered');
         }
+        //2、玩家离开房间
     });
     socket.on('register', function (data) {
         var roomId = data.roomId;
@@ -67,7 +71,7 @@ io.on('connection', function (socket) {
         var pair = rooms[roomId];
 
         // 为当前房间增加玩家
-        if (pair.room.acceptPlayer(new Player({ name: playerName }))) {
+        if (pair.room.acceptPlayer(new Player({ name: playerName, socketId: this.id }))) {
             // 通知当前房间渲染新玩家资料
             sockets[pair.socketId].emit('playerEnter', { playName: playerName });
             _.print('Player ', playerName, 'Enter room', roomId);

@@ -2,7 +2,7 @@ var uuid = require('uuid');
 
 var Player = function (params) {
 	this.name = params.name || 'anony';
-	this.status = params.status || 0;
+	this.socketId = params.socketId;
 }
 
 var Room = function (params) {
@@ -16,7 +16,7 @@ Room.prototype = {
 		if (this.players.length >= this.capacity) {
 			return false;
 		} else {
-			if (player instanceof Player){
+			if (player instanceof Player) {
 				this.players.push(player);
 				return true;
 			}
