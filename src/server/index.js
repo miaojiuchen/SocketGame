@@ -57,7 +57,7 @@ io.on('connection', function (socket) {
                 sockets[p.socketId].emit('roomDisconnect', {});
             });
             delete pair;
-            _.print('Room', roomId, 'Disconnected and unregistered');
+            _.print('Room', roomId, 'Disconnected');
         }
         //2、玩家离开房间
         else {
@@ -70,24 +70,34 @@ io.on('connection', function (socket) {
             }
         }
     });
+
+    // 在服务器端注册当前房间号
     socket.on('register', function (data) {
         var roomId = data.roomId;
         rooms[roomId] = { room: initRoom({ roomId: roomId }), socketId: this.id };
-        _.print('Room', roomId, 'Connected and registered');
+        _.print('Room', roomId, 'Connected');
     });
-    socket.on('playerEnter', function (data) {
-        var playerName = data.playerName, roomId = data.roomId;
-        var pair = rooms[roomId];
 
-        // 为当前房间增加玩家
-        if (pair.room.acceptPlayer(new Player({ name: playerName, socketId: this.id }))) {
-            // 通知当前房间渲染新玩家资料
-            sockets[pair.socketId].emit('playerEnter', { playerName: playerName });
-            players[this.id] = { roomId: pair.room.roomId, playerName: playerName };
-            _.print('Player', playerName, 'enter room', roomId);
+    socket.on('playerTryEnter', function (data) {
+        var playerName = data.playerName, roomId = data.roomId;
+
+        var pair = rooms[roomId];
+        if (!pair) {
+            message = '未找到房间';
         } else {
-            return;
+            // 为当前房间增加玩家
+            if (pair.room.acceptPlayer(new Player({ name: playerName, socketId: this.id }))) {
+                // 通知当前房间渲染新玩家资料
+                sockets[pair.socketId].emit('playerEnter', { playerName: playerName });
+                players[this.id] = { roomId: pair.room.roomId, playerName: playerName };
+                this.emit('playerTryEnterOk');
+                _.print('Player', playerName, 'enter room', roomId);
+                return;
+            } else {
+                message = '房间已满';
+            }
         }
+        this.emit('playerTryEnterFail', { message: message });
     });
 });
 
