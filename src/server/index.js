@@ -6,8 +6,8 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
-var oa = require('object-assign');
-var _ = oa({}, require('./utils.js'), require('underscore'));
+var objectAssign = require('object-assign');
+var _ = objectAssign({}, require('./utils.js'), require('underscore'));
 
 var models = require('./models.js');
 var Room = models.Room;
