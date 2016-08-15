@@ -37,7 +37,6 @@
         // 房间意外关闭，清除所有监听
         socket.on('roomDisconnect', function (data) {
             $('mask2').style.display = 'block';
-            alert('房间已关闭');
         });
 
         socket.on('playerTryEnterFail', function (data) {

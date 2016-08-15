@@ -85,8 +85,9 @@ io.on('connection', function (socket) {
         if (!pair) {
             message = '未找到房间';
         } else {
+            var tmpRes = pair.room.acceptPlayer(new Player({ name: playerName, socketId: this.id }));
             // 为当前房间增加玩家
-            if (pair.room.acceptPlayer(new Player({ name: playerName, socketId: this.id }))) {
+            if (tmpRes.isSuccess) {
                 // 通知当前房间渲染新玩家资料
                 sockets[pair.socketId].emit('playerEnter', { playerName: playerName });
                 players[this.id] = { roomId: pair.room.roomId, playerName: playerName };
@@ -94,7 +95,7 @@ io.on('connection', function (socket) {
                 _.print('Player', playerName, 'enter room', roomId);
                 return;
             } else {
-                message = '房间已满';
+                message = tmpRes.message;
             }
         }
         this.emit('playerTryEnterFail', { message: message });

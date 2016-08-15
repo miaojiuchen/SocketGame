@@ -1,4 +1,5 @@
 var uuid = require('uuid');
+var _ = require('underscore');
 
 var Player = function (params) {
 	this.name = params.name || 'anony';
@@ -14,19 +15,20 @@ var Room = function (params) {
 Room.prototype = {
 	acceptPlayer: function (player) {
 		if (this.players.length >= this.capacity) {
-			return false;
+			return { isSuccess: false, message = '房间已满' };
 		} else {
 			if (player instanceof Player) {
+				var found = _.find(this.players, function (p) { return p.playerName === player.name });
+				if (found) {
+					return { isSuccess: false, message: '当前房间已有玩家使用此昵称，请重试' };
+				}
 				this.players.push(player);
-				return true;
+				return { isSuccess: true };
 			}
 			else
 				throw new Error('Room.acceptPlayer: Param must be a valid Player Object');
 		}
 	},
-	currentSize: function () {
-		return this.players.length;
-	}
 }
 
 exports.initRoom = function (params) {
